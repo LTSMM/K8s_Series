@@ -1,0 +1,65 @@
+Resource တည်ဆောက်ကတည်းက Label ကိုသတ်မှတ်လိုရင် manifest ထဲမှာ metadata ေအာက်မှာ label parameter မှာ key-value pair ထည့်ပေးရုံပါပဲ
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+   name: label_lab1
+   labels:
+     app: label_lab1
+     env: dev
+spec:
+   containers:
+   - image: ws/lab
+     name: label_lab1
+```
+
+pod တစ်ခု create လုပ်လိုက်မယ်
+
+```text
+ $ kubectl create -f label_lab1.yaml
+ pod "label_lab1" created
+```
+
+**kubectl get pods command** နဲ့ဆိုရင် label ကို မြင်ရမှာ မြင်ရမှာမဟုတ်ပါဘူး။ **--show-labels** option ထည့်ပေးပီး pod ရဲ့ label ကို တွေ့ရပါမယ်။
+
+```text
+$ kubectl get pods --show-labels
+NAME READY STATUS RESTARTS AGE LABELS
+label_lab1 1/1 Running 0 10m app=label_lab1, env=dev
+```
+
+Pod ဆောက်ပီးမှ label ထည့်လို့လဲရပါတယ်။
+
+```text
+$ kubectl label pods label_lab1 rel=1.0
+pod "label_lab1" labeled
+
+$ kubectl get pods --show-labels
+NAME READY STATUS RESTARTS AGE LABELS
+label_lab1 1/1 Running 0 16m app=label_lab1, env=debug, rel=1.0
+```
+
+Pod resource ကို filter ပီး လိုသလို manage လုပ်လိုတဲ့အခါမှာ --selector ဒါမှမဟုတ် -l option သုံးပါတယ်။
+
+```text
+$ kubectl get pods --selector app=label_lab1
+NAME READY STATUS RESTARTS AGE
+label_lab1 1/1 Running 0 27m
+
+$ kubectl get pods -l rel=1.0
+NAME READY STATUS RESTARTS AGE
+label_lab1 1/1 Running 0 27m
+```
+
+Label ကို key ကိုပဲသုံးပီး value မပါပဲနဲ့ ရှာလို့လဲရပါတယ်။
+
+```text
+$ kubectl get pods -l rel
+NAME READY STATUS RESTARTS AGE
+label_lab1 1/1 Running 0 37m
+
+$ kubectl get pods -l '!rel'
+NAME READY STATUS RESTARTS AGE
+kube-manual 1/1 Running 0 1dpodex 1/1 Running 0 1d
+```
